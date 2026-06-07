@@ -66,6 +66,12 @@ export default function SharePage() {
       return;
     }
 
+    if (whatHappened.length < 50 || lowestPoint.length < 20 || biggestMistake.length < 20 || whatChanged.length < 20 || whatLearned.length < 20 || advice.length < 20 || reflection.length < 20) {
+      setError('Please ensure all text sections meet the minimum character requirements.');
+      setLoading(false);
+      return;
+    }
+
     if (visibility === 'nickname' && !nickname) {
       setError('Please provide a Pen Name/Nickname.');
       setLoading(false);
@@ -316,7 +322,10 @@ export default function SharePage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1.5">What Happened? * (min 50 chars)</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-400">What Happened? *</label>
+                  <span className={`text-[10px] ${whatHappened.length < 50 ? 'text-amber-500' : 'text-emerald-500'}`}>{whatHappened.length}/50 chars</span>
+                </div>
                 <textarea
                   required
                   rows={4}
@@ -329,7 +338,10 @@ export default function SharePage() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1.5">The Lowest Point *</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-neutral-400">The Lowest Point *</label>
+                    <span className={`text-[10px] ${lowestPoint.length < 20 ? 'text-amber-500' : 'text-emerald-500'}`}>{lowestPoint.length}/20 chars</span>
+                  </div>
                   <textarea
                     required
                     rows={3}
@@ -341,7 +353,10 @@ export default function SharePage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1.5">Your Biggest Mistake *</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-neutral-400">Your Biggest Mistake *</label>
+                    <span className={`text-[10px] ${biggestMistake.length < 20 ? 'text-amber-500' : 'text-emerald-500'}`}>{biggestMistake.length}/20 chars</span>
+                  </div>
                   <textarea
                     required
                     rows={3}
@@ -364,7 +379,10 @@ export default function SharePage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1.5">What Changed? *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-400">What Changed? *</label>
+                  <span className={`text-[10px] ${whatChanged.length < 20 ? 'text-amber-500' : 'text-emerald-500'}`}>{whatChanged.length}/20 chars</span>
+                </div>
                 <textarea
                   required
                   rows={3}
@@ -376,7 +394,10 @@ export default function SharePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1.5">What Did You Learn? *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-400">What Did You Learn? *</label>
+                  <span className={`text-[10px] ${whatLearned.length < 20 ? 'text-amber-500' : 'text-emerald-500'}`}>{whatLearned.length}/20 chars</span>
+                </div>
                 <textarea
                   required
                   rows={3}
@@ -390,7 +411,10 @@ export default function SharePage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1.5">Advice for Others *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-400">Advice for Others *</label>
+                  <span className={`text-[10px] ${advice.length < 20 ? 'text-amber-500' : 'text-emerald-500'}`}>{advice.length}/20 chars</span>
+                </div>
                 <textarea
                   required
                   rows={3}
@@ -402,7 +426,10 @@ export default function SharePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1.5">Reflection & Present View *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-400">Reflection & Present View *</label>
+                  <span className={`text-[10px] ${reflection.length < 20 ? 'text-amber-500' : 'text-emerald-500'}`}>{reflection.length}/20 chars</span>
+                </div>
                 <textarea
                   required
                   rows={3}

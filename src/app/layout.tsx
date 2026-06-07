@@ -40,6 +40,9 @@ export const metadata: Metadata = {
     description: 'Everyone celebrates Chapter 20. We collect Chapters 1–19.',
     images: ['/og-image.png'],
   },
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
