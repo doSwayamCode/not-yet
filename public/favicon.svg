@@ -1,23 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="120" height="40" fill="none">
   <defs>
-    <linearGradient id="amberFav" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="amberRing" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
       <stop offset="100%" stop-color="#D97706"/>
     </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <!-- Background -->
-  <rect width="32" height="32" rx="8" fill="#050505"/>
-  <!-- Three small empty circles (chapters 1-19) -->
-  <circle cx="5" cy="20" r="3" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
-  <line x1="8.2" y1="20" x2="10.8" y2="20" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-dasharray="1.5 1"/>
-  <circle cx="14" cy="20" r="2.8" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
-  <line x1="16.9" y1="20" x2="19.1" y2="20" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-dasharray="1.5 1"/>
-  <circle cx="22" cy="20" r="2.6" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
-  <!-- Long connector to win circle -->
-  <line x1="24.7" y1="20" x2="27" y2="20" stroke="url(#amberFav)" stroke-width="1" opacity="0.7"/>
-  <!-- Amber ring (the win / chapter 20) -->
-  <circle cx="30" cy="20" r="3.5" stroke="url(#amberFav)" stroke-width="2"/>
-  <!-- notYET text top -->
-  <text x="2" y="11" font-family="Arial, sans-serif" font-size="6" font-weight="900" fill="white" letter-spacing="-0.3">not</text>
-  <text x="13.5" y="11" font-family="Arial, sans-serif" font-size="6" font-weight="900" fill="#F59E0B" letter-spacing="-0.3">YET</text>
+
+  <rect width="120" height="40" rx="8" fill="#050505"/>
+
+  <!-- Step 1 -->
+  <circle cx="20" cy="20" r="8" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+  <!-- Dash connector 1 -->
+  <line x1="30" y1="20" x2="38" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
+  
+  <!-- Step 2 -->
+  <circle cx="48" cy="20" r="8" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+  <!-- Dash connector 2 -->
+  <line x1="58" y1="20" x2="66" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
+  
+  <!-- Step 3 -->
+  <circle cx="76" cy="20" r="8" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+  <!-- Long connector to win -->
+  <line x1="86" y1="20" x2="96" y2="20" stroke="url(#amberRing)" stroke-width="1" opacity="0.8"/>
+  
+  <!-- Final step: Amber ring -->
+  <circle cx="106" cy="20" r="8" stroke="url(#amberRing)" stroke-width="2.5" filter="url(#glow)"/>
 </svg>
