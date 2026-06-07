@@ -55,6 +55,12 @@ export async function GET() {
     const flaggedJourneysList = await Journey.find({ status: 'flagged' }).exec();
     const flaggedCommentsList = await Comment.find({ isFlagged: true }).exec();
 
+    // Fetch all active/published journeys for general administration (limit 150)
+    const allJourneysList = await Journey.find({ status: { $ne: 'archived' } })
+      .sort({ createdAt: -1 })
+      .limit(150)
+      .exec();
+
     const costDashboard = {
       mongodb: {
         usedKb: (mongoUsedBytes / 1024).toFixed(2),
@@ -95,6 +101,7 @@ export async function GET() {
       costDashboard,
       flaggedJourneysList,
       flaggedCommentsList,
+      allJourneysList,
       recentLogs,
     });
   } catch (error: any) {

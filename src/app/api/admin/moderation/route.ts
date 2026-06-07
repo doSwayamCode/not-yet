@@ -51,6 +51,16 @@ export async function POST(req: Request) {
           details: `Rejected & archived journey ID: ${targetId} ("${journey.title}")`,
           severity: 'danger',
         });
+      } else if (action === 'delete') {
+        // Permanent delete
+        await Journey.deleteOne({ _id: targetId });
+        await ActivityLog.create({
+          userId: session.userId,
+          username: session.username || 'admin',
+          action: 'MODERATION_DELETE_JOURNEY',
+          details: `Permanently deleted journey ID: ${targetId} ("${journey.title}")`,
+          severity: 'danger',
+        });
       }
     } else if (targetType === 'comment') {
       const comment = await Comment.findById(targetId);

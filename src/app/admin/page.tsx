@@ -44,6 +44,7 @@ interface AdminData {
   };
   flaggedJourneysList: any[];
   flaggedCommentsList: any[];
+  allJourneysList: any[];
   recentLogs: LogItem[];
 }
 
@@ -53,6 +54,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'moderation' | 'costs' | 'logs' | 'exports'>('moderation');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Custom Admin Authentication state
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -112,7 +114,7 @@ export default function AdminDashboard() {
     setData(null);
   };
 
-  const handleModerate = async (targetType: 'journey' | 'comment', targetId: string, action: 'approve' | 'reject') => {
+  const handleModerate = async (targetType: 'journey' | 'comment', targetId: string, action: 'approve' | 'reject' | 'delete') => {
     try {
       const res = await fetch('/api/admin/moderation', {
         method: 'POST',
@@ -407,6 +409,73 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* All Active Posts Management */}
+            <div className="border-t border-neutral-900 pt-8 mt-8 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">
+                    Manage Active Archive Posts ({data.allJourneysList?.length || 0})
+                  </h2>
+                  <p className="text-[10px] text-neutral-500">Search, review details, and permanently delete any active post.</p>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Filter by title or author username..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-neutral-950 border border-neutral-850 rounded-lg px-3.5 py-1.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500 transition w-full sm:max-w-xs"
+                />
+              </div>
+
+              {/* Grid of Active Posts */}
+              {(!data.allJourneysList || data.allJourneysList.length === 0) ? (
+                <div className="p-8 text-center text-xs text-neutral-500 border border-neutral-900 rounded-xl italic">
+                  No active posts found in database.
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {(data.allJourneysList || [])
+                    .filter((j) => {
+                      const term = searchQuery.toLowerCase();
+                      return (
+                        j.title.toLowerCase().includes(term) ||
+                        (j.author?.username || '').toLowerCase().includes(term)
+                      );
+                    })
+                    .map((j) => (
+                      <div key={j._id} className="bg-[#0A0A0A] border border-neutral-900 hover:border-neutral-800 transition rounded-xl p-4 flex flex-col justify-between space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between text-[9px] text-neutral-500 font-mono">
+                            <span>ID: {j._id}</span>
+                            <span>{new Date(j.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <h4 className="text-xs font-bold text-white mt-1.5 line-clamp-1">{j.title}</h4>
+                          <span className="text-[9px] text-neutral-550 block">
+                            By: @{j.author?.username || 'anonymous'} ({j.visibility})
+                          </span>
+                          <p className="text-[10px] text-neutral-400 line-clamp-2 mt-1 leading-relaxed">
+                            {j.whatHappened}
+                          </p>
+                        </div>
+                        <div className="flex justify-end gap-2 pt-2 border-t border-neutral-900/50">
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Are you sure you want to permanently delete "${j.title}"?`)) {
+                                handleModerate('journey', j._id, 'delete');
+                              }
+                            }}
+                            className="flex items-center gap-1.5 text-[10px] font-bold bg-red-950/40 hover:bg-red-900/50 border border-red-900/40 text-red-200 px-3 py-1.5 rounded-lg transition"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete Post
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
