@@ -271,8 +271,9 @@ export async function POST(req: Request) {
       console.error('Failed to log journey error to DB:', logDbError);
     }
 
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: (error as any).errors[0].message }, { status: 400 });
+    if (error.name === 'ZodError' || error instanceof z.ZodError) {
+      const firstIssue = error.errors?.[0]?.message || 'Invalid form input details';
+      return NextResponse.json({ error: firstIssue }, { status: 400 });
     }
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
