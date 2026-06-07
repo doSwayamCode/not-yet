@@ -18,18 +18,27 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'notYET — The Global Archive of Human Persistence',
   description: 'Everyone celebrates Chapter 20. We collect Chapters 1–19. The world\'s archive of rejection stories, failed attempts, lessons, pivots, and comebacks.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://not-yet-nu.vercel.app'),
   openGraph: {
     title: 'notYET — The Archive of Rejection and Comebacks',
     description: 'Everyone celebrates Chapter 20. We collect Chapters 1–19.',
-    url: './',
+    url: 'https://not-yet-nu.vercel.app',
     siteName: 'notYET',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'notYET — Chapters 1 through 19 complete. Everyone celebrates Chapter 20. We collect Chapters 1–19.',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'notYET — Rejections & Persistence',
     description: 'Everyone celebrates Chapter 20. We collect Chapters 1–19.',
+    images: ['/og-image.png'],
   },
 };
 
