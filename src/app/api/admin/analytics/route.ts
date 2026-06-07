@@ -44,8 +44,8 @@ export async function GET() {
     const cacheDailyLimit = 50000; // Local memory cache daily limit simulation
     const cacheUsagePct = (cacheOperationsEstimated / cacheDailyLimit) * 100;
 
-    // Media Storage (Cloudinary 25GB Free tier)
-    const uploadedImagesCount = await User.countDocuments({ avatarUrl: { $regex: /cloudinary/ } });
+    // Media Storage (ImgBB Free tier)
+    const uploadedImagesCount = await User.countDocuments({ avatarUrl: { $regex: /imgbb|ibb|cloudinary/ } });
     const imageSizeAvg = 1.5; // MB
     const cloudinaryUsedMb = uploadedImagesCount * imageSizeAvg;
     const cloudinaryLimitMb = 25 * 1024; // 25GB

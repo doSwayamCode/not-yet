@@ -387,22 +387,22 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Cloudinary Media Storage */}
+              {/* ImgBB Media Storage */}
               <div className="bg-[#0F0F0F] border border-neutral-900 rounded-xl p-5 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-900 pb-3">
                   <div className="flex items-center gap-2 text-xs font-bold text-white">
                     <HardDrive className="w-4 h-4 text-indigo-400" />
-                    CLOUDINARY IMAGE STORAGE
+                    IMGBB IMAGE STORAGE
                   </div>
-                  <span className="text-[10px] font-mono text-neutral-400">{costDashboard.cloudinary.percentage}%</span>
+                  <span className="text-[10px] font-mono text-neutral-400">Active</span>
                 </div>
                 <div className="space-y-2">
                   <div className="w-full h-2 bg-neutral-950 rounded-full overflow-hidden border border-neutral-900">
-                    <div className="h-full bg-indigo-500" style={{ width: `${costDashboard.cloudinary.percentage}%` }}></div>
+                    <div className="h-full bg-indigo-500" style={{ width: `100%` }}></div>
                   </div>
                   <div className="flex items-center justify-between text-[10px] text-neutral-500 font-mono">
                     <span>Used: {costDashboard.cloudinary.usedMb} MB</span>
-                    <span>Limit: 25.00 GB (25,600 MB)</span>
+                    <span>Limit: Unlimited (32MB/image)</span>
                   </div>
                 </div>
               </div>
