@@ -18,6 +18,7 @@ import {
   MessageSquare,
   AlertTriangle,
   Award,
+  Trash2,
 } from 'lucide-react';
 
 interface TimelineEvent {
@@ -234,6 +235,25 @@ export default function JourneyDetailPage() {
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
+  // Delete own journey
+  const handleDeleteJourney = async () => {
+    if (!window.confirm('Are you sure you want to delete this story? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/journeys/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        router.push('/explore');
+      } else {
+        alert(data.error || 'Failed to delete. Please try again.');
+      }
+    } catch {
+      alert('Network error. Could not delete post.');
+    }
+  };
+
+  // Check if current user is owner of this journey
+  const isOwner = isSignedIn && journey && user?.id === journey.userId;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center text-neutral-400">
@@ -286,6 +306,16 @@ export default function JourneyDetailPage() {
             </Link>
 
             <div className="flex items-center gap-3">
+              {/* Delete button — visible only to the post owner */}
+              {isOwner && (
+                <button
+                  onClick={handleDeleteJourney}
+                  className="inline-flex items-center gap-1.5 text-xs text-red-300 hover:text-red-100 bg-red-950/30 hover:bg-red-900/40 border border-red-900/50 px-3 py-1.5 rounded-lg transition"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete My Post
+                </button>
+              )}
               <button
                 onClick={() => setFocusMode(true)}
                 className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white bg-neutral-950 border border-neutral-900 px-3 py-1.5 rounded-lg transition"

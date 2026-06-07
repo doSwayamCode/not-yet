@@ -89,7 +89,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const hasCookie = typeof document !== 'undefined' && document.cookie.split('; ').some((c) => c.startsWith('admin_session_token=notYET123'));
-    if (hasCookie || (isSignedIn && user?.email === 'swayamgupta999@gmail.com')) {
+    const authorized = isAdminLoggedIn || hasCookie || (isSignedIn && user?.email === 'swayamgupta999@gmail.com');
+    if (authorized) {
       fetchAdminData();
     } else {
       setLoading(false);
@@ -125,10 +126,10 @@ export default function AdminDashboard() {
         // Refresh dashboard data
         fetchAdminData();
       } else {
-        alert(resData.error || 'Failed to resolve moderation step.');
+        alert(resData.error || 'Moderation action failed.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      alert('Network error. Please try again.');
     }
   };
 

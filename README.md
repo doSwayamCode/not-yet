@@ -1,87 +1,184 @@
-# notYET — The Global Archive of Human Persistence
+# notYET — The Archive of Human Persistence
 
-`notYET` is a living, interactive digital archive dedicated to documenting the undocumented parts of success: the rejections, the failed interviews, the closed startups, the burnout, and the pivots. Everyone celebrates Chapter 20; we collect Chapters 1–19.
-
----
-
-## 🌟 Key Features
-
-*   **3D Particle Morphing Background**: An immersive Three.js interactive canvas displaying floating space particles that dynamically gather and spell out **"NOT YET"** as the user scrolls to the bottom of the page.
-*   **Dual Authentication System**:
-    *   **Production**: Clerk Auth for production identity management.
-    *   **Development**: Mock Auth fallback (toggleable in local development via cookies) to explore all user levels (Student, Creator, Admin) without consuming Clerk API quotas.
-*   **On-the-Fly DB Registration**: Automatic user profile synchronization in MongoDB Atlas during any core interaction (publishing a story, writing a comment, reacting to posts).
-*   **Cloud Image Uploads**: Fast, native base64 integration with ImgBB API for hosting profile avatars and attachment images.
-*   **Safe API Handlers**: Built-in try-catch parsing wrappers that report actual error codes and database details instead of generic JSON parser failures.
+> *Everyone celebrates Chapter 20. We collect Chapters 1–19.*
 
 ---
 
-## ⚙️ Environment Variables
+The internet is full of highlight reels — offer letters, funding announcements, promotion posts. But the years of uncertainty, the 100+ rejection emails, the abandoned repositories, and the 3 AM breakdowns that preceded those wins? **They stay hidden.**
 
-Copy the `.env.example` file to `.env` in the root directory:
+**notYET** is a platform that archives exactly that. It is a living, human record of persistence — a place where people document every attempt, every failure, and every pivot that eventually led somewhere meaningful. Not to celebrate suffering, but to show the full picture of what persistence actually looks like.
+
+Because every success is built on a "Not Yet."
+
+---
+
+## What is notYET?
+
+notYET is a **community archive platform** where users write structured, long-form accounts of their journeys through rejection, failure, and eventual breakthroughs. Each "journey" maps a person's real timeline — the specific rejections, the lowest moments, the mistakes made, the pivots taken, and the lessons that changed everything.
+
+It is part documentary, part archive, part solidarity network.
+
+Think of it as the opposite of LinkedIn — not polished, not performative, just honest.
+
+---
+
+## Core Features
+
+### 📖 Journey Archive
+Users publish structured journey documents covering:
+- What they were trying to achieve
+- Every attempt along a mapped timeline (with fail/success/milestone markers)
+- Their lowest point and biggest mistake
+- The pivots and lessons learned
+- Advice for people currently in their "chapter 1–19"
+
+Posting supports **three visibility modes**: fully public, nickname/pseudonym, or completely anonymous — so people can share freely without fear.
+
+### 🤝 Solidarity Reactions
+No toxic "likes". Instead, readers react with:
+`🤝 Relatable` · `🎒 Been There` · `💡 Learned Something` · `✨ Inspired Me` · `❤️ Needed This` · `✊ Respect`
+
+A support vocabulary built for honest stories, not performative engagement.
+
+### 🗣️ Threaded Comments
+Nested comment threads for conversation. Anonymous commenting supported — because sometimes solidarity is easier without a name attached.
+
+### 🏆 Behind The Win
+A unique infographic generator where users connect their archive of failures to their eventual win. Import your published journeys directly, arrange the timeline, and export a shareable visual that shows the *full path*, not just the destination.
+
+### 👤 Author Profiles
+Public profiles showing all published journeys, rejection stats, and community impact — an honest portfolio of persistence.
+
+### 🔍 Explore & Filter
+Browse the archive by category (tech, startups, academics, creative fields, sports, etc.), filter by tags, and discover stories that resonate.
+
+### 🔐 Admin Control Panel
+A private, credential-gated dashboard for content moderation, flagged post review, infrastructure cost tracking, and system audit logs. Accessible only via `/admin` with authorized credentials.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Authentication | Clerk (production) / Mock Auth (development) |
+| Database | MongoDB Atlas via Mongoose |
+| Animations | Framer Motion, GSAP, Three.js |
+| Forms | React Hook Form + Zod validation |
+| Charts | Recharts |
+| Icons | Lucide React |
+| Deployment | Vercel |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- A MongoDB Atlas account (or use the built-in local JSON fallback — no setup needed)
+- A Clerk account for authentication (optional for local dev)
+
+### Installation
+
+```bash
+git clone https://github.com/doSwayamCode/not-yet.git
+cd not-yet
+npm install
+```
+
+### Environment Setup
+
+Copy the example env file:
 
 ```bash
 cp .env.example .env
 ```
 
-Define the following configuration variables:
+Fill in your values. The app runs in **mock mode by default** — no external services required for local development. The local JSON file database activates automatically if `MONGODB_URI` is not set.
 
-```ini
-# App Config
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NODE_ENV=development
+```env
+# Required for production
+MONGODB_URI=mongodb+srv://...
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+```
 
-# Database Setup (MongoDB Atlas)
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.klepbqp.mongodb.net/notyet
+### Run Locally
 
-# Clerk Auth (Production Mode)
-# Leave blank to automatically activate Local Mock Auth mode.
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+```bash
+npm run dev
+```
 
-# ImgBB API Key (For Free Cloud Image Hosting)
-IMGBB_API_KEY=your_imgbb_api_key_here
+Open [http://localhost:3000](http://localhost:3000).
+
+In development, use the **simulation tray** (bottom-right drawer) to switch between mock user profiles without needing Clerk configured.
+
+### Build for Production
+
+```bash
+npm run build
+npm start
 ```
 
 ---
 
-## 🛠️ Local Development
+## Project Structure
 
-1.  Install the project dependencies:
-    ```bash
-    npm install
-    ```
-2.  Run the Next.js development server:
-    ```bash
-    npm run dev
-    ```
-3.  Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-*Note: If no Clerk publishable key is supplied in `.env`, the system will run in **Mock Auth Mode**. You can switch between Aarav Patel (Student), Devika Sharma (Creator), or Swayam Gupta (Admin) roles using the floating dashboard in the bottom-right corner.*
+```
+src/
+├── app/
+│   ├── page.tsx              # Homepage / Hero
+│   ├── explore/              # Browse all journeys
+│   ├── share/                # Submit a new journey
+│   ├── journeys/[id]/        # Journey detail view
+│   ├── profile/[username]/   # Author profile page
+│   ├── behind-the-win/       # Infographic generator
+│   ├── admin/                # Admin control panel (credential-gated)
+│   ├── sign-in/ sign-up/     # Clerk auth pages
+│   └── api/                  # All API routes
+│       ├── journeys/         # CRUD + reactions + comments
+│       ├── admin/            # Analytics + moderation endpoints
+│       ├── profile/          # Public profile data
+│       └── stats/            # Global counters
+├── components/
+│   ├── SignatureAnimation.tsx # Three.js particle hero animation
+│   ├── GlobalCounter.tsx      # Live community stat counters
+│   └── MockAuthSwitcher.tsx   # Dev-mode user simulation tray
+├── lib/
+│   ├── auth-server.ts         # Server-side session handling
+│   ├── auth-wrapper.tsx       # Client auth context (Clerk/Mock)
+│   └── db.ts                  # MongoDB + local JSON fallback
+└── models/                    # Mongoose schemas
+```
 
 ---
 
-## 🗄️ Database Setup (MongoDB Atlas)
+## Security Notes
 
-To ensure Vercel can connect to your MongoDB Atlas cluster:
-1. Log in to the [MongoDB Atlas Dashboard](https://cloud.mongodb.com/).
-2. Under **Security**, click **Network Access**.
-3. Add a new IP Access entry: **`0.0.0.0/0`** (Allow access from anywhere). This is required since Vercel utilizes dynamic serverless IP ranges.
-4. Go to **Database Access** and verify that your database user has read and write privileges (`readWriteAnyDatabase` or specific db access).
+- Admin credentials are validated server-side via cookie token — the `/admin` route is inaccessible without matching credentials
+- API routes strip raw error messages in production — no stack traces or DB details are exposed in responses
+- All admin endpoints are guarded by `requireAdmin()` which validates the session server-side
+- `.env` is excluded from version control via `.gitignore`
 
 ---
 
-## 🚀 Deployment (Vercel)
+## Philosophy
 
-1.  Commit and push all your code changes to your GitHub repository:
-    ```bash
-    git add .
-    git commit -m "feat: setup project environment and configurations"
-    git push origin main
-    ```
-2.  Open the [Vercel Dashboard](https://vercel.com/) and click **Add New Project**.
-3.  Import the GitHub repository for `notYET`.
-4.  Expand the **Environment Variables** section and copy-paste all configuration keys from your `.env` file (ensure you include production keys for `MONGODB_URI`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and `IMGBB_API_KEY`).
-5.  Click **Deploy**. Vercel will automatically build the application and host it.
+Most persistence platforms tell you to "embrace failure." notYET doesn't preach — it witnesses.
+
+We believe the most powerful thing you can do for someone in the middle of Chapter 7 is show them what Chapter 7 looked like for someone who eventually reached Chapter 20. Not to promise them the same outcome. Just to make the road feel less lonely.
+
+**notYET is not a motivation platform. It is an archive of real people, keeping going.**
+
+---
+
+## License
+
+MIT — build on it, learn from it, fork it.
+
+---
+
+*Built with persistence by [Swayam Gupta](https://github.com/doSwayamCode)*
