@@ -204,7 +204,7 @@ export default function SignatureAnimation() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none -z-10">
+    <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
       <div ref={containerRef} className="w-full h-full" />
     </div>
   );

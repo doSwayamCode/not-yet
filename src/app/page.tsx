@@ -58,7 +58,7 @@ export default function HomePage() {
       </section>
 
       {/* Mission / Detail Explanation Section */}
-      <section className="relative z-10 border-t border-neutral-900 bg-[#070707] py-20">
+      <section className="relative z-10 border-t border-neutral-900 bg-[#070707]/80 backdrop-blur-md py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -122,7 +122,7 @@ export default function HomePage() {
       </section>
 
       {/* Interactive Archive Showcase */}
-      <section className="relative z-10 py-16 bg-[#070707] border-t border-b border-neutral-900">
+      <section className="relative z-10 py-16 bg-[#070707]/80 backdrop-blur-md border-t border-b border-neutral-900">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black mb-4">Ready to enter the archive?</h2>
           <p className="text-neutral-400 max-w-lg mx-auto text-sm mb-8">
