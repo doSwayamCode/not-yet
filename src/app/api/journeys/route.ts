@@ -272,7 +272,7 @@ export async function POST(req: Request) {
     }
 
     if (error.name === 'ZodError' || error instanceof z.ZodError) {
-      const firstIssue = error.errors?.[0]?.message || 'Invalid form input details';
+      const firstIssue = error.issues?.[0]?.message || error.errors?.[0]?.message || 'Invalid form input details';
       return NextResponse.json({ error: firstIssue }, { status: 400 });
     }
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
