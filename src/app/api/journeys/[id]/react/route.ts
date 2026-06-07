@@ -45,7 +45,34 @@ export async function POST(
     const existing = await Reaction.findOne({ journeyId: id, userId: session.userId, type });
 
     const authorUser = await User.findOne({ clerkId: journey.userId });
-    const reactorUser = await User.findOne({ clerkId: session.userId });
+    let reactorUser = await User.findOne({ clerkId: session.userId });
+    if (!reactorUser) {
+      reactorUser = await User.create({
+        clerkId: session.userId,
+        email: session.email || '',
+        username: session.username || `user_${Math.random().toString(36).substring(7)}`,
+        displayName: session.displayName || 'Anonymous Persistence',
+        avatarUrl: session.avatarUrl || '',
+        role: session.role || 'user',
+        persistenceScore: 10,
+        stats: {
+          attemptsCount: 0,
+          rejectionsCount: 0,
+          lessonsCount: 0,
+          peopleHelped: 0,
+          storiesPublished: 0,
+        },
+        achievements: ['First Step'],
+      });
+
+      await ActivityLog.create({
+        userId: session.userId,
+        username: reactorUser.username,
+        action: 'USER_REGISTER',
+        details: `Registered user: ${reactorUser.username} during reaction toggle`,
+        severity: 'info',
+      });
+    }
 
     if (existing) {
       // Toggle off: Delete reaction

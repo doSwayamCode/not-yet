@@ -109,7 +109,13 @@ export default function SharePage() {
         }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error(`Server response error (Status ${res.status}: ${res.statusText || 'Unknown'}). Please check your connection or logs.`);
+      }
+
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to submit journey');
       }

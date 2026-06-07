@@ -136,9 +136,34 @@ export async function POST(req: Request) {
     const readingTime = Math.max(1, Math.round(totalWords / 200));
 
     // Get User for metadata and points
-    const user = await User.findOne({ clerkId: session.userId });
+    let user = await User.findOne({ clerkId: session.userId });
     if (!user) {
-      return NextResponse.json({ error: 'User profile not found. Run sync first.' }, { status: 400 });
+      // Automatically register user in DB if they don't exist yet
+      user = await User.create({
+        clerkId: session.userId,
+        email: session.email || '',
+        username: session.username || `user_${Math.random().toString(36).substring(7)}`,
+        displayName: session.displayName || 'Anonymous Persistence',
+        avatarUrl: session.avatarUrl || '',
+        role: session.role || 'user',
+        persistenceScore: 10,
+        stats: {
+          attemptsCount: 0,
+          rejectionsCount: 0,
+          lessonsCount: 0,
+          peopleHelped: 0,
+          storiesPublished: 0,
+        },
+        achievements: ['First Step'],
+      });
+
+      await ActivityLog.create({
+        userId: session.userId,
+        username: user.username,
+        action: 'USER_REGISTER',
+        details: `Registered user: ${user.username} during journey submission`,
+        severity: 'info',
+      });
     }
 
     // Determine author profile exposure
