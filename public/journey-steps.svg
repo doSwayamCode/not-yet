@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="520" height="160" fill="none">
+  <defs>
+    <linearGradient id="amberRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Step 1: Empty circle (past attempt) -->
+  <circle cx="110" cy="80" r="30" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+
+  <!-- Dash connector 1 -->
+  <line x1="141" y1="80" x2="178" y2="80" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+  <!-- Step 2: Empty circle (past attempt) -->
+  <circle cx="208" cy="80" r="28" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+
+  <!-- Dash connector 2 -->
+  <line x1="237" y1="80" x2="272" y2="80" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+  <!-- Step 3: Empty circle (past attempt) -->
+  <circle cx="300" cy="80" r="26" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+
+  <!-- Long connector to win -->
+  <line x1="327" y1="80" x2="388" y2="80" stroke="url(#amberRing)" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Final step: Amber ring (THE WIN) with glow -->
+  <circle cx="420" cy="80" r="34" stroke="url(#amberRing)" stroke-width="6" filter="url(#glow)"/>
+</svg>

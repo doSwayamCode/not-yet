@@ -18,17 +18,30 @@ export async function GET() {
       return NextResponse.json({ error: authError.message || 'Unauthorized' }, { status: 403 });
     }
 
-    // System Stats
-    const totalUsers = await User.countDocuments();
-    const totalJourneys = await Journey.countDocuments({ status: { $ne: 'archived' } });
-    const flaggedJourneys = await Journey.countDocuments({ status: 'flagged' });
-    const flaggedComments = await Comment.countDocuments({ isFlagged: true });
-    
-    // Fetch recent logs
-    const recentLogs = await ActivityLog.find()
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .exec();
+    // Parallelize all database queries for maximum performance
+    const [
+      totalUsers,
+      totalJourneys,
+      flaggedJourneys,
+      flaggedComments,
+      recentLogs,
+      cacheOperationsEstimated,
+      uploadedImagesCount,
+      flaggedJourneysList,
+      flaggedCommentsList,
+      allJourneysList
+    ] = await Promise.all([
+      User.countDocuments(),
+      Journey.countDocuments({ status: { $ne: 'archived' } }),
+      Journey.countDocuments({ status: 'flagged' }),
+      Comment.countDocuments({ isFlagged: true }),
+      ActivityLog.find().sort({ createdAt: -1 }).limit(50).exec(),
+      ActivityLog.countDocuments({ createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }),
+      User.countDocuments({ avatarUrl: { $regex: /imgbb|ibb|cloudinary/ } }),
+      Journey.find({ status: 'flagged' }).exec(),
+      Comment.find({ isFlagged: true }).exec(),
+      Journey.find({ status: { $ne: 'archived' } }).sort({ createdAt: -1 }).limit(150).exec()
+    ]);
 
     // Cost Estimations (Calculated based on average payload sizes)
     const userDocSizeAvg = 1.2; // KB
@@ -39,27 +52,15 @@ export async function GET() {
     const mongoFreeLimit = 512 * 1024 * 1024; // 512MB MongoDB Free Tier
     const mongoUsagePct = (mongoUsedBytes / mongoFreeLimit) * 100;
 
-    // Memory Cache operations count (simulated or tracked)
-    const cacheOperationsEstimated = await ActivityLog.countDocuments({ createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }) * 3;
+    const cacheOperationsCount = cacheOperationsEstimated * 3;
     const cacheDailyLimit = 50000; // Local memory cache daily limit simulation
-    const cacheUsagePct = (cacheOperationsEstimated / cacheDailyLimit) * 100;
+    const cacheUsagePct = (cacheOperationsCount / cacheDailyLimit) * 100;
 
     // Media Storage (ImgBB Free tier)
-    const uploadedImagesCount = await User.countDocuments({ avatarUrl: { $regex: /imgbb|ibb|cloudinary/ } });
     const imageSizeAvg = 1.5; // MB
     const cloudinaryUsedMb = uploadedImagesCount * imageSizeAvg;
     const cloudinaryLimitMb = 25 * 1024; // 25GB
     const cloudinaryUsagePct = (cloudinaryUsedMb / cloudinaryLimitMb) * 100;
-
-    // Fetch flagged content for moderation queues
-    const flaggedJourneysList = await Journey.find({ status: 'flagged' }).exec();
-    const flaggedCommentsList = await Comment.find({ isFlagged: true }).exec();
-
-    // Fetch all active/published journeys for general administration (limit 150)
-    const allJourneysList = await Journey.find({ status: { $ne: 'archived' } })
-      .sort({ createdAt: -1 })
-      .limit(150)
-      .exec();
 
     const costDashboard = {
       mongodb: {
@@ -103,9 +104,18 @@ export async function GET() {
       flaggedCommentsList,
       allJourneysList,
       recentLogs,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'X-Content-Type-Options': 'nosniff',
+      }
     });
   } catch (error: any) {
-    console.error('Error fetching admin stats:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    // Do not leak raw error message - log server-side only
+    const isDev = process.env.NODE_ENV === 'development';
+    return NextResponse.json(
+      { error: isDev ? error.message : 'Internal Server Error' },
+      { status: 500, headers: { 'Cache-Control': 'no-store' } }
+    );
   }
 }

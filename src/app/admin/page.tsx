@@ -81,7 +81,6 @@ export default function AdminDashboard() {
       }
       setData(resData);
     } catch (err: any) {
-      console.error(err);
       setError(err.message || 'Unauthorized access.');
     } finally {
       setLoading(false);

@@ -48,12 +48,15 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Scroll helper indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-50 text-[10px] uppercase tracking-widest text-neutral-500">
-          <span>Scroll to connect timelines</span>
-          <div className="w-1.5 h-6 rounded-full bg-neutral-800 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-2 bg-amber-500 rounded-full animate-bounce"></div>
-          </div>
+        {/* Journey Steps SVG Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-60 hover:opacity-90 transition-opacity duration-500">
+          <img
+            src="/journey-steps.svg"
+            alt="Journey steps — every attempt leads to the win"
+            className="w-64 select-none pointer-events-none"
+            draggable={false}
+          />
+          <span className="text-[9px] uppercase tracking-widest text-neutral-600 font-medium">Your journey, chapter by chapter</span>
         </div>
       </section>
 

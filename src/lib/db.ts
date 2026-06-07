@@ -25,7 +25,6 @@ export async function connectToDatabase() {
       };
 
       cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-        console.log('Successfully connected to MongoDB.');
         return mongoose;
       });
     }
@@ -35,7 +34,7 @@ export async function connectToDatabase() {
       return cached.conn;
     } catch (e) {
       cached.promise = null;
-      console.error('MongoDB connection failed. Falling back to local JSON database.', e);
+      // Silently fall back to local JSON DB – do not log connection details
     }
   }
 
