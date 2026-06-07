@@ -24,10 +24,10 @@ const MOCK_PROFILES = [
   },
   {
     id: 'mock_admin_1',
-    email: 'admin@notyet.com',
-    username: 'admin_director',
-    displayName: 'Devika Sharma (Admin)',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+    email: 'swayamgupta999@gmail.com',
+    username: 'swayam_admin',
+    displayName: 'Swayam Gupta (Admin)',
+    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
     role: 'admin',
   },
   {
@@ -58,12 +58,13 @@ export async function getServerAuth(): Promise<IAuthSession> {
         };
       }
 
-      const role = (sessionClaims?.metadata as any)?.role === 'admin' ? 'admin' : 'user';
+      const email = user?.emailAddresses[0]?.emailAddress ?? null;
+      const role = email === 'swayamgupta999@gmail.com' ? 'admin' : 'user';
       return {
         userId,
         role,
-        email: user?.emailAddresses[0]?.emailAddress ?? null,
-        username: user?.username ?? user?.emailAddresses[0]?.emailAddress.split('@')[0] ?? 'user',
+        email,
+        username: user?.username ?? email?.split('@')[0] ?? 'user',
         displayName: user?.fullName ?? user?.username ?? 'User',
         avatarUrl: user?.imageUrl ?? null,
         isMock: false,

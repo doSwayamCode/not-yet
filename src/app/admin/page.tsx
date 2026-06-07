@@ -137,8 +137,8 @@ export default function AdminDashboard() {
     return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
   };
 
-  // Guard: Not signed in or not admin
-  const isAuthorized = isSignedIn && (user?.role === 'admin' || user?.username === 'admin_director');
+  // Guard: Strictly allow only swayamgupta999@gmail.com
+  const isAuthorized = isSignedIn && user?.email === 'swayamgupta999@gmail.com';
 
   if (loading) {
     return (
