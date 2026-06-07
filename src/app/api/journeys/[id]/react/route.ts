@@ -46,6 +46,14 @@ export async function POST(
 
     const authorUser = await User.findOne({ clerkId: journey.userId });
     let reactorUser = await User.findOne({ clerkId: session.userId });
+    if (!reactorUser && session.email) {
+      reactorUser = await User.findOneAndUpdate(
+        { email: session.email },
+        { $set: { clerkId: session.userId } },
+        { new: true }
+      );
+    }
+
     if (!reactorUser) {
       reactorUser = await User.create({
         clerkId: session.userId,

@@ -137,6 +137,14 @@ export async function POST(req: Request) {
 
     // Get User for metadata and points
     let user = await User.findOne({ clerkId: session.userId });
+    if (!user && session.email) {
+      user = await User.findOneAndUpdate(
+        { email: session.email },
+        { $set: { clerkId: session.userId } },
+        { new: true }
+      );
+    }
+    
     if (!user) {
       // Automatically register user in DB if they don't exist yet
       user = await User.create({

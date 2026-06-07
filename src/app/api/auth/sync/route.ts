@@ -15,6 +15,14 @@ export async function POST() {
 
     let user = await User.findOne({ clerkId: session.userId });
 
+    if (!user && session.email) {
+      user = await User.findOneAndUpdate(
+        { email: session.email },
+        { $set: { clerkId: session.userId } },
+        { new: true }
+      );
+    }
+
     if (!user) {
       // Create new user in the DB
       user = await User.create({
