@@ -16,12 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'notYET — The Global Archive of Human Persistence',
-  description: 'Everyone celebrates Chapter 20. We collect Chapters 1–19. The world\'s archive of rejection stories, failed attempts, lessons, pivots, and comebacks.',
+  title: 'notYET — Real Interview Experiences & Failure Stories in India & Abroad',
+  description: 'Read real interview experiences, startup failure stories, and career comebacks from professionals in India and abroad. The world\'s archive of rejection stories and lessons learned.',
+  keywords: ['interview experiences', 'interview experiences India', 'abroad interview experiences', 'rejection stories', 'startup failures', 'career comebacks', 'tech interviews', 'non-tech interviews', 'notYET'],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://not-yet-nu.vercel.app'),
   openGraph: {
-    title: 'notYET — The Archive of Rejection and Comebacks',
-    description: 'Everyone celebrates Chapter 20. We collect Chapters 1–19.',
+    title: 'notYET — Real Interview Experiences & Failure Stories in India & Abroad',
+    description: 'Read real interview experiences, startup failure stories, and career comebacks from professionals in India and abroad.',
     url: 'https://not-yet-nu.vercel.app',
     siteName: 'notYET',
     type: 'website',
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'notYET — Chapters 1 through 19 complete. Everyone celebrates Chapter 20. We collect Chapters 1–19.',
+        alt: 'notYET — Real Interview Experiences & Failure Stories',
       },
     ],
   },
