@@ -181,7 +181,34 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (isClerkEnabled) {
-    return <ClerkProvider>{children}</ClerkProvider>;
+    return (
+      <ClerkProvider
+        appearance={{
+          variables: {
+            colorPrimary: '#f59e0b', // amber-500
+            colorText: '#f5f5f5', // neutral-100
+            colorTextSecondary: '#a3a3a3', // neutral-400
+            colorBackground: '#0c0c0c', // neutral-950
+            colorInputBackground: '#171717', // neutral-900
+            colorInputText: '#f5f5f5',
+            colorBorder: '#262626', // neutral-800
+          },
+          elements: {
+            card: 'bg-[#0f0f0f] border border-neutral-800 shadow-2xl rounded-xl',
+            headerTitle: 'text-2xl font-black text-white',
+            headerSubtitle: 'text-sm text-neutral-400',
+            formButtonPrimary: 'bg-amber-500 hover:bg-amber-400 text-black font-semibold transition',
+            formFieldInput: 'bg-neutral-900 border border-neutral-800 text-white rounded-lg focus:border-amber-500 focus:ring-1 focus:ring-amber-500',
+            footerActionText: 'text-neutral-400',
+            footerActionLink: 'text-amber-500 hover:text-amber-400',
+            dividerText: 'text-neutral-500',
+            dividerLine: 'bg-neutral-800',
+          }
+        }}
+      >
+        {children}
+      </ClerkProvider>
+    );
   }
   return <MockAuthProvider>{children}</MockAuthProvider>;
 }

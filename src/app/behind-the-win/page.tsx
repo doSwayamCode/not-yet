@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Plus, Trash, Image, Award, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useAppUser } from '@/lib/auth-wrapper';
 
 interface PrecedingFailure {
   date: string;
@@ -9,6 +10,8 @@ interface PrecedingFailure {
 }
 
 export default function BehindTheWin() {
+  const { isSignedIn, user } = useAppUser();
+  const [importing, setImporting] = useState(false);
   const [successTitle, setSuccessTitle] = useState('Placed as Software Engineer at Google');
   const [successDate, setSuccessDate] = useState('June 2026');
   
@@ -32,6 +35,42 @@ export default function BehindTheWin() {
   const removeFailure = (index: number) => {
     if (failures.length === 1) return;
     setFailures(failures.filter((_, idx) => idx !== index));
+  };
+
+  const handleImportFromArchive = async () => {
+    if (!user?.username) return;
+    setImporting(true);
+    try {
+      const res = await fetch(`/api/journeys?author=${user.username}`);
+      const data = await res.json();
+      if (data.success && data.journeys && data.journeys.length > 0) {
+        // Collect all timeline events from all user journeys
+        const importedFailures: PrecedingFailure[] = [];
+        data.journeys.forEach((journey: any) => {
+          if (journey.timeline) {
+            journey.timeline.forEach((event: any) => {
+              importedFailures.push({
+                date: event.date,
+                title: event.title,
+              });
+            });
+          }
+        });
+        if (importedFailures.length > 0) {
+          setFailures(importedFailures);
+          alert(`Successfully imported ${importedFailures.length} attempts from your archive!`);
+        } else {
+          alert('No timeline events found in your archive journeys.');
+        }
+      } else {
+        alert('No archived journeys found to import. Try sharing a journey first!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to import archive data.');
+    } finally {
+      setImporting(false);
+    }
   };
 
   // Export Infographic to PNG
@@ -222,13 +261,25 @@ export default function BehindTheWin() {
                 <h2 className="text-xs font-bold text-rose-500 uppercase tracking-widest">Chapters 1-19: Rejections</h2>
                 <p className="text-[10px] text-neutral-500 font-sans">Add preceding failures chronologically.</p>
               </div>
-              <button
-                onClick={addFailure}
-                className="flex items-center gap-1 text-[10px] font-bold bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-500 px-2.5 py-1.5 rounded transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Add Rejection
-              </button>
+              <div className="flex gap-2">
+                {isSignedIn && user && (
+                  <button
+                    onClick={handleImportFromArchive}
+                    disabled={importing}
+                    className="flex items-center gap-1 text-[10px] font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 px-2.5 py-1.5 rounded transition disabled:opacity-50"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {importing ? 'Importing...' : 'Import Archive'}
+                  </button>
+                )}
+                <button
+                  onClick={addFailure}
+                  className="flex items-center gap-1 text-[10px] font-bold bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-500 px-2.5 py-1.5 rounded transition"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Rejection
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">

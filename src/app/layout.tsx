@@ -81,12 +81,6 @@ export default function RootLayout({
               {/* Action Buttons & Auth */}
               <div className="flex items-center gap-4">
                 <Link
-                  href="/admin"
-                  className="text-xs px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white transition"
-                >
-                  Admin Panel
-                </Link>
-                <Link
                   href="/share"
                   className="hidden sm:inline-flex items-center justify-center rounded-md bg-amber-500 px-3.5 py-1.5 text-xs font-semibold text-black hover:bg-amber-400 transition"
                 >

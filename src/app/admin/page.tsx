@@ -54,6 +54,20 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'moderation' | 'costs' | 'logs' | 'exports'>('moderation');
 
+  // Custom Admin Authentication state
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  // Check if admin token cookie is already set on page load
+  useEffect(() => {
+    const hasCookie = typeof document !== 'undefined' && document.cookie.split('; ').some((c) => c.startsWith('admin_session_token=notYET123'));
+    if (hasCookie) {
+      setIsAdminLoggedIn(true);
+    }
+  }, []);
+
   const fetchAdminData = async () => {
     setLoading(true);
     setError(null);
@@ -73,12 +87,30 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (isSignedIn) {
+    const hasCookie = typeof document !== 'undefined' && document.cookie.split('; ').some((c) => c.startsWith('admin_session_token=notYET123'));
+    if (hasCookie || (isSignedIn && user?.email === 'swayamgupta999@gmail.com')) {
       fetchAdminData();
     } else {
       setLoading(false);
     }
-  }, [isSignedIn, user]);
+  }, [isSignedIn, user, isAdminLoggedIn]);
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminEmail.trim() === 'swayamgupta999@gmail.com' && adminPassword === 'notYET123') {
+      document.cookie = 'admin_session_token=notYET123; path=/; max-age=86400; SameSite=Lax';
+      setIsAdminLoggedIn(true);
+      setLoginError(null);
+    } else {
+      setLoginError('Invalid email address or password.');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    document.cookie = 'admin_session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
+    setIsAdminLoggedIn(false);
+    setData(null);
+  };
 
   const handleModerate = async (targetType: 'journey' | 'comment', targetId: string, action: 'approve' | 'reject') => {
     try {
@@ -138,7 +170,7 @@ export default function AdminDashboard() {
   };
 
   // Guard: Strictly allow only swayamgupta999@gmail.com
-  const isAuthorized = isSignedIn && user?.email === 'swayamgupta999@gmail.com';
+  const isAuthorized = isAdminLoggedIn || (isSignedIn && user?.email === 'swayamgupta999@gmail.com');
 
   if (loading) {
     return (
@@ -154,14 +186,58 @@ export default function AdminDashboard() {
   if (!isAuthorized) {
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4 bg-[#050505]">
-        <div className="max-w-md w-full bg-[#0F0F0F] border border-neutral-900 rounded-xl p-8 text-center glow-red">
-          <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto mb-4 animate-bounce" />
-          <h2 className="text-xl font-bold mb-2">ACCESS DENIED</h2>
-          <p className="text-xs text-neutral-500 mb-6">
-            Administrator permissions are required to view the SaaS control panel. 
-          </p>
-          <div className="text-[10px] text-amber-500 bg-neutral-950 p-4 rounded font-mono border border-neutral-900 text-left">
-            💡 <strong>Mock Mode instructions:</strong> Click the "Switch User/Log In" button in the bottom right drawer and select the <strong>Devika Sharma (Admin)</strong> profile to access this dashboard.
+        <div className="max-w-md w-full bg-[#0F0F0F] border border-neutral-900 rounded-xl p-8 shadow-2xl">
+          <div className="text-center mb-6">
+            <ShieldAlert className="w-12 h-12 text-amber-500 mx-auto mb-3" />
+            <h2 className="text-2xl font-black text-white tracking-tight">ADMIN CONTROL LOGIN</h2>
+            <p className="text-xs text-neutral-500 mt-1">Authorized operations team access only.</p>
+          </div>
+
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            {loginError && (
+              <div className="p-3 text-xs bg-red-950/40 border border-red-900/50 rounded-lg text-red-200">
+                ⚠️ {loginError}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-[10px] uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
+                Admin Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                placeholder="swayamgupta999@gmail.com"
+                className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
+                Access Password
+              </label>
+              <input
+                type="password"
+                required
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500 transition"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm rounded-lg transition"
+            >
+              Sign In to Control Panel
+            </button>
+          </form>
+
+          <div className="mt-6 text-[10px] text-amber-500/80 bg-neutral-950 p-4 rounded font-mono border border-neutral-900 text-left leading-relaxed">
+            💡 <strong>Mock Mode instructions:</strong> Click the "Switch User/Log In" button in the bottom right drawer and select the <strong>Swayam Gupta (Admin)</strong> profile to access this dashboard.
           </div>
         </div>
       </div>
@@ -195,13 +271,21 @@ export default function AdminDashboard() {
             </h1>
             <p className="text-xs text-neutral-500 mt-1">Manage content flags, inspect system event logs, and review cloud resources.</p>
           </div>
-          <button
-            onClick={fetchAdminData}
-            className="flex items-center gap-1.5 text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 px-3.5 py-2 rounded-lg transition"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Sync Dashboard
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchAdminData}
+              className="flex items-center gap-1.5 text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 px-3.5 py-2 rounded-lg transition"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Sync Dashboard
+            </button>
+            <button
+              onClick={handleAdminLogout}
+              className="flex items-center gap-1.5 text-xs bg-red-950/40 hover:bg-red-900/40 border border-red-900/60 px-3.5 py-2 rounded-lg text-red-200 transition font-medium"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
 
         {/* Overview Widgets */}
