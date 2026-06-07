@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "emobmq73t",
+    "createdAt": "2026-06-07T11:34:35.932Z",
+    "updatedAt": "2026-06-07T11:34:35.933Z",
+    "key": "global_counter",
+    "applicationsRejected": 18492031,
+    "interviewsFailed": 4129850,
+    "hackathonsLost": 1328099,
+    "startupsClosed": 201842,
+    "projectsAbandoned": 3119410,
+    "lessonsShared": 171980,
+    "peopleHelped": 38780,
+    "storiesPublished": 12056
+  }
+]

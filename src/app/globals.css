@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg-primary: #050505;
+  --color-bg-card: #0F0F0F;
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: #A3A3A3;
+  --color-accent-amber: #F5B041;
+  --color-accent-green: #2ECC71;
+  --color-accent-red: #E74C3C;
+  --color-accent-blue: #5DADE2;
+  --color-border-card: #1C1C1C;
+}
+
+:root {
+  --background: #050505;
+  --foreground: #FFFFFF;
+  --font-sans: var(--font-geist-sans), Inter, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+body {
+  background-color: #050505;
+  color: #FFFFFF;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #1C1C1C;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F5B041;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Grid Backdrop */
+.grid-bg {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center;
+}
+
+/* Glow effects */
+.glow-amber {
+  box-shadow: 0 0 40px -5px rgba(245, 176, 65, 0.15);
+}
+
+.glow-red {
+  box-shadow: 0 0 40px -5px rgba(231, 76, 60, 0.15);
+}
+
+.glow-green {
+  box-shadow: 0 0 40px -5px rgba(46, 204, 113, 0.15);
+}
+
+/* Text Reveal Animation */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-reveal {
+  animation: textReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Star field effect */
+.star {
+  position: absolute;
+  background-color: #ffffff;
+  border-radius: 50%;
+  pointer-events: none;
+}
