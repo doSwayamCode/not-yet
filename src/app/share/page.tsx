@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppUser } from '@/lib/auth-wrapper';
+import { useAppUser, SignInButton } from '@/lib/auth-wrapper';
 import { PenTool, Plus, Trash, ArrowRight, ShieldCheck, Heart, AlertTriangle } from 'lucide-react';
 
 interface TimelineEvent {
@@ -136,11 +136,18 @@ export default function SharePage() {
           <PenTool className="w-12 h-12 text-amber-500 mx-auto mb-4" />
           <h2 className="text-xl sm:text-2xl font-bold mb-2">Share your "Not Yet"</h2>
           <p className="text-xs text-neutral-400 mb-6">
-            You must be logged in to contribute to the archive. Please log in using the bottom right simulation tray or Clerk button.
+            You must be logged in to contribute to the archive. Share your failures, pivots, and persistence.
           </p>
-          <div className="text-[10px] text-neutral-600 bg-neutral-950 p-3 rounded font-mono border border-neutral-900">
-            Click any profile in the "Mock Auth Mode" drawer on the bottom-right to sign in instantly.
-          </div>
+          
+          <SignInButton className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg text-sm transition duration-300 shadow-lg shadow-amber-500/10 mb-4">
+            Sign In with Clerk
+          </SignInButton>
+
+          {isMock && (
+            <div className="text-[10px] text-neutral-600 bg-neutral-950 p-3 rounded font-mono border border-neutral-900">
+              Click any profile in the "Mock Auth Mode" drawer on the bottom-right to sign in instantly.
+            </div>
+          )}
         </div>
       </div>
     );
