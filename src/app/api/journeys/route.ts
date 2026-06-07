@@ -258,6 +258,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, journey: newJourney, pointsEarned });
   } catch (error: any) {
     console.error('Error creating journey:', error);
+    
+    try {
+      await ActivityLog.create({
+        userId: 'system_error',
+        username: 'system',
+        action: 'JOURNEY_CREATE_ERROR',
+        details: `Failed to create journey: ${error.message || 'Unknown error'}. Stack: ${error.stack || 'No stack'}`,
+        severity: 'danger',
+      });
+    } catch (logDbError) {
+      console.error('Failed to log journey error to DB:', logDbError);
+    }
+
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: (error as any).errors[0].message }, { status: 400 });
     }
