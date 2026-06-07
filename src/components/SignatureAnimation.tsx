@@ -122,7 +122,7 @@ export default function SignatureAnimation() {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (docHeight > 0) {
-        scrollPercent = Math.min(scrollTop / (docHeight * 0.7), 1); // Spell it before reaching very bottom
+        scrollPercent = Math.min(scrollTop / docHeight, 1); // Fully formed at the bottom of the page
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -204,7 +204,7 @@ export default function SignatureAnimation() {
   }, []);
 
   return (
-    <div className="absolute inset-0 w-full h-full pointer-events-none">
+    <div className="fixed inset-0 w-full h-full pointer-events-none -z-10">
       <div ref={containerRef} className="w-full h-full" />
     </div>
   );
