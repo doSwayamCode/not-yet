@@ -57,18 +57,19 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Custom Admin Authentication state
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    // Initialize synchronously from cookie so no second effect needed
+    if (typeof document !== 'undefined') {
+      return document.cookie.split('; ').some((c) => c.startsWith('admin_session_token=notYET123'));
+    }
+    return false;
+  });
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Check if admin token cookie is already set on page load
-  useEffect(() => {
-    const hasCookie = typeof document !== 'undefined' && document.cookie.split('; ').some((c) => c.startsWith('admin_session_token=notYET123'));
-    if (hasCookie) {
-      setIsAdminLoggedIn(true);
-    }
-  }, []);
+  // Ref guard: prevents fetchAdminData from being called more than once automatically
+  const hasFetched = React.useRef(false);
 
   const fetchAdminData = async () => {
     setLoading(true);
@@ -87,15 +88,22 @@ export default function AdminDashboard() {
     }
   };
 
+  // Single stable effect — only runs once on mount, or when isAdminLoggedIn flips true via form submit
   useEffect(() => {
-    const hasCookie = typeof document !== 'undefined' && document.cookie.split('; ').some((c) => c.startsWith('admin_session_token=notYET123'));
-    const authorized = isAdminLoggedIn || hasCookie || (isSignedIn && user?.email === 'swayamgupta999@gmail.com');
+    if (hasFetched.current) return; // Already fetched — never re-run automatically
+
+    const hasCookie = isAdminLoggedIn; // already initialized from cookie in useState
+    const clerkAdmin = isSignedIn && user?.email === 'swayamgupta999@gmail.com';
+    const authorized = hasCookie || clerkAdmin;
+
     if (authorized) {
+      hasFetched.current = true;
       fetchAdminData();
     } else {
       setLoading(false);
     }
-  }, [isSignedIn, user, isAdminLoggedIn]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdminLoggedIn]); // Only depend on isAdminLoggedIn — stable boolean, not Clerk's user object
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,13 +111,16 @@ export default function AdminDashboard() {
       document.cookie = 'admin_session_token=notYET123; path=/; max-age=86400; SameSite=Lax';
       setIsAdminLoggedIn(true);
       setLoginError(null);
+      // Fetch data immediately — don't wait for useEffect
+      hasFetched.current = true;
+      fetchAdminData();
     } else {
       setLoginError('Invalid email address or password.');
     }
   };
-
   const handleAdminLogout = () => {
     document.cookie = 'admin_session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
+    hasFetched.current = false;
     setIsAdminLoggedIn(false);
     setData(null);
   };
