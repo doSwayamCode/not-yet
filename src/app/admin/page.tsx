@@ -182,6 +182,34 @@ export default function AdminDashboard() {
     return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
   };
 
+  const renderLinkedText = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+    const exactUrlRegex = /^(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)$/i;
+    const parts = text.split(urlRegex);
+
+    return parts.map((part, idx) => {
+      if (!exactUrlRegex.test(part)) return <React.Fragment key={idx}>{part}</React.Fragment>;
+
+      const trailingPunctuation = part.match(/[),.!?]+$/)?.[0] || '';
+      const cleanUrl = trailingPunctuation ? part.slice(0, -trailingPunctuation.length) : part;
+      const href = cleanUrl.startsWith('www.') ? `https://${cleanUrl}` : cleanUrl;
+
+      return (
+        <React.Fragment key={idx}>
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="text-amber-500 underline underline-offset-2 hover:text-amber-400"
+          >
+            {cleanUrl}
+          </a>
+          {trailingPunctuation}
+        </React.Fragment>
+      );
+    });
+  };
+
   // Guard: Strictly allow only swayamgupta999@gmail.com
   const isAuthorized = isAdminLoggedIn || (isSignedIn && user?.email === 'swayamgupta999@gmail.com');
 
@@ -345,7 +373,7 @@ export default function AdminDashboard() {
         {activeTab === 'moderation' && (
           <div className="grid md:grid-cols-2 gap-8">
             {/* Flagged Journeys */}
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-2">
               <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">Flagged Journeys ({data.flaggedJourneysList?.length || 0})</h2>
               
               {data.flaggedJourneysList?.length === 0 ? (
@@ -353,17 +381,99 @@ export default function AdminDashboard() {
                   No journeys flagged for review.
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {data.flaggedJourneysList.map((j) => (
-                    <div key={j._id} className="bg-[#0F0F0F] border border-neutral-900 rounded-xl p-4 space-y-3">
-                      <div>
+                    <div key={j._id} className="bg-[#0F0F0F] border border-neutral-900 rounded-xl p-5 space-y-5">
+                      <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-mono text-neutral-500">ID: {j._id}</span>
-                          <span className="text-[10px] text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded font-semibold uppercase">Flagged</span>
+                          <span className="text-[10px] text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded font-semibold uppercase">
+                            {j.isPublished ? 'Flagged' : 'Pending Approval'}
+                          </span>
                         </div>
                         <h4 className="text-xs font-bold text-white mt-1.5">{j.title}</h4>
-                        <p className="text-[11px] text-neutral-400 line-clamp-2 mt-1">{j.whatHappened}</p>
+                        <span className="text-[10px] text-neutral-500 block mt-1">Author: @{j.author?.username || 'anonymous'}</span>
+                        {j.linkedinProfileUrl && (
+                          <a
+                            href={j.linkedinProfileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] text-amber-500 hover:text-amber-400 underline underline-offset-2 block mt-1"
+                          >
+                            Verify LinkedIn profile
+                          </a>
+                        )}
                       </div>
+
+                      <div className="grid md:grid-cols-3 gap-3 text-[11px]">
+                        <div className="bg-neutral-950 border border-neutral-900 rounded-lg p-3">
+                          <span className="block text-[9px] uppercase tracking-wider text-neutral-500 font-bold mb-1">Goal</span>
+                          <p className="text-neutral-300 leading-relaxed">{j.goal}</p>
+                        </div>
+                        <div className="bg-neutral-950 border border-neutral-900 rounded-lg p-3">
+                          <span className="block text-[9px] uppercase tracking-wider text-neutral-500 font-bold mb-1">Category</span>
+                          <p className="text-neutral-300 leading-relaxed">{j.category}</p>
+                        </div>
+                        <div className="bg-neutral-950 border border-neutral-900 rounded-lg p-3">
+                          <span className="block text-[9px] uppercase tracking-wider text-neutral-500 font-bold mb-1">Current Status</span>
+                          <p className="text-neutral-300 leading-relaxed">{j.currentStatus}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 text-[11px] text-neutral-300">
+                        <div>
+                          <h5 className="text-[10px] uppercase tracking-wider text-amber-500 font-bold mb-1.5">What Happened?</h5>
+                          <p className="whitespace-pre-line leading-relaxed">{renderLinkedText(j.whatHappened || '')}</p>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-rose-500 font-bold mb-1.5">Lowest Point</h5>
+                            <p className="whitespace-pre-line leading-relaxed text-neutral-400">{j.lowestPoint}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold mb-1.5">Biggest Mistake</h5>
+                            <p className="whitespace-pre-line leading-relaxed text-neutral-400">{j.biggestMistake}</p>
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-amber-500 font-bold mb-1.5">What Changed?</h5>
+                            <p className="whitespace-pre-line leading-relaxed text-neutral-400">{j.whatChanged}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-1.5">What Learned?</h5>
+                            <p className="whitespace-pre-line leading-relaxed text-neutral-400">{j.whatLearned}</p>
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-amber-500 font-bold mb-1.5">Advice</h5>
+                            <p className="whitespace-pre-line leading-relaxed text-neutral-400">{j.advice}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold mb-1.5">Reflection</h5>
+                            <p className="whitespace-pre-line leading-relaxed text-neutral-400">{j.reflection}</p>
+                          </div>
+                        </div>
+                        {j.timeline?.length > 0 && (
+                          <div>
+                            <h5 className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold mb-2">Timeline</h5>
+                            <div className="grid md:grid-cols-2 gap-2">
+                              {j.timeline.map((evt: any, idx: number) => (
+                                <div key={`${j._id}-timeline-${idx}`} className="bg-neutral-950 border border-neutral-900 rounded-lg p-3">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[9px] font-mono text-neutral-500">{evt.date}</span>
+                                    <span className="text-[9px] uppercase text-neutral-500">{evt.status}</span>
+                                  </div>
+                                  <div className="text-[11px] font-bold text-white mt-1">{evt.title}</div>
+                                  <p className="text-[10px] text-neutral-400 mt-1 leading-relaxed">{evt.description}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => handleModerate('journey', j._id, 'approve')}

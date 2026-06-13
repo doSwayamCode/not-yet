@@ -33,6 +33,7 @@ export interface IJourney {
   reflection: string;
   readingTime: number;
   visibility: 'public' | 'anonymous' | 'nickname';
+  linkedinProfileUrl?: string;
   isPublished: boolean;
   status: 'active' | 'flagged' | 'archived';
   reactions: {
@@ -82,6 +83,7 @@ const JourneySchema = new Schema<IJourneyDocument>(
     reflection: { type: String, required: true },
     readingTime: { type: Number, default: 1 },
     visibility: { type: String, enum: ['public', 'anonymous', 'nickname'], default: 'public' },
+    linkedinProfileUrl: { type: String },
     isPublished: { type: Boolean, default: true },
     status: { type: String, enum: ['active', 'flagged', 'archived'], default: 'active' },
     reactions: {

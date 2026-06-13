@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
-import { Journey } from '@/models/Journey';
+import { Journey, type ITimelineEvent } from '@/models/Journey';
 import { Comment } from '@/models/Comment';
 import { ActivityLog } from '@/models/ActivityLog';
+import { CounterMetrics } from '@/models/CounterMetrics';
+import { User } from '@/models/User';
 import { requireAdmin } from '@/lib/auth-server';
 
 // POST /api/admin/moderation
@@ -32,18 +34,60 @@ export async function POST(req: Request) {
       }
 
       if (action === 'approve') {
-        // Clear flag status
-        await Journey.findByIdAndUpdate(targetId, { $set: { status: 'active' } });
+        const wasPendingApproval = !journey.isPublished;
+
+        await Journey.findByIdAndUpdate(targetId, { $set: { status: 'active', isPublished: true } });
+
+        if (wasPendingApproval) {
+          const timeline = journey.timeline as ITimelineEvent[];
+          const failureCount = timeline.filter((evt) => evt.status === 'fail').length;
+          const interviewCount = timeline.filter((evt) => evt.title.toLowerCase().includes('interview') && evt.status === 'fail').length;
+          const startupCount = timeline.filter((evt) => evt.title.toLowerCase().includes('startup') && evt.status === 'fail').length;
+          const hackathonCount = timeline.filter((evt) => evt.title.toLowerCase().includes('hackathon') && evt.status === 'fail').length;
+          const projectCount = timeline.filter((evt) => evt.title.toLowerCase().includes('project') && evt.status === 'fail').length;
+          const pointsEarned = 50 + (failureCount * 10);
+          const user = await User.findOne({ clerkId: journey.userId });
+
+          if (user) {
+            await User.findByIdAndUpdate(user._id, {
+              $inc: {
+                persistenceScore: pointsEarned,
+                'stats.storiesPublished': 1,
+                'stats.attemptsCount': timeline.length,
+                'stats.rejectionsCount': failureCount,
+                'stats.lessonsCount': 1,
+              },
+            });
+          }
+
+          await CounterMetrics.findOneAndUpdate(
+            { key: 'global_counter' },
+            {
+              $inc: {
+                applicationsRejected: failureCount,
+                interviewsFailed: interviewCount,
+                hackathonsLost: hackathonCount,
+                startupsClosed: startupCount,
+                projectsAbandoned: projectCount,
+                lessonsShared: 1,
+                peopleHelped: 5,
+                storiesPublished: 1,
+              },
+            },
+            { upsert: true, new: true }
+          );
+        }
+
         await ActivityLog.create({
           userId: session.userId,
           username: session.username || 'admin',
           action: 'MODERATION_APPROVE_JOURNEY',
-          details: `Approved flagged journey ID: ${targetId} ("${journey.title}")`,
+          details: `Approved journey ID: ${targetId} ("${journey.title}")`,
           severity: 'info',
         });
       } else if (action === 'reject') {
         // Archive (soft delete) journey
-        await Journey.findByIdAndUpdate(targetId, { $set: { status: 'archived' } });
+        await Journey.findByIdAndUpdate(targetId, { $set: { status: 'archived', isPublished: false } });
         await ActivityLog.create({
           userId: session.userId,
           username: session.username || 'admin',

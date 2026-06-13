@@ -33,6 +33,9 @@ export default function SharePage() {
   const [reflection, setReflection] = useState('');
   const [visibility, setVisibility] = useState<'public' | 'anonymous' | 'nickname'>('public');
   const [nickname, setNickname] = useState('');
+  const [linkedinProfileUrl, setLinkedinProfileUrl] = useState('');
+  const [submittedForApproval, setSubmittedForApproval] = useState(false);
+  const isAdminUser = user?.email === 'swayamgupta999@gmail.com';
 
   // Dynamic Timeline
   const [timeline, setTimeline] = useState<TimelineEvent[]>([
@@ -78,6 +81,12 @@ export default function SharePage() {
       return;
     }
 
+    if (!isAdminUser && !linkedinProfileUrl.trim()) {
+      setError('Please add your LinkedIn profile link for admin verification.');
+      setLoading(false);
+      return;
+    }
+
     // Filter timeline events that have empty values
     const filteredTimeline = timeline.filter((evt) => evt.date && evt.title && evt.description);
     if (filteredTimeline.length === 0) {
@@ -112,6 +121,7 @@ export default function SharePage() {
           reflection,
           visibility,
           nickname: visibility === 'nickname' ? nickname : undefined,
+          linkedinProfileUrl: linkedinProfileUrl.trim() || undefined,
         }),
       });
 
@@ -131,7 +141,11 @@ export default function SharePage() {
         await fetch('/api/auth/sync', { method: 'POST' });
       }
 
-      router.push(`/journeys/${data.journey._id}`);
+      if (data.pendingApproval) {
+        setSubmittedForApproval(true);
+      } else {
+        router.push(`/journeys/${data.journey._id}`);
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'An unexpected error occurred.');
@@ -160,6 +174,27 @@ export default function SharePage() {
               Click any profile in the "Mock Auth Mode" drawer on the bottom-right to sign in instantly.
             </div>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  if (submittedForApproval) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4 bg-[#050505] text-white">
+        <div className="max-w-md w-full bg-[#0F0F0F] border border-neutral-900 rounded-xl p-8 text-center glow-amber">
+          <ShieldCheck className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">Submitted for admin approval</h2>
+          <p className="text-xs text-neutral-400 mb-6">
+            Thanks for sharing your experience. Admin will go through your story and approve once it is verified.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/explore')}
+            className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg text-sm transition duration-300 shadow-lg shadow-amber-500/10"
+          >
+            Back to Explore
+          </button>
         </div>
       </div>
     );
@@ -311,6 +346,23 @@ export default function SharePage() {
                 </div>
               )}
             </div>
+
+            {!isAdminUser && (
+              <div className="border-t border-neutral-900 pt-4">
+                <label className="block text-xs font-semibold text-neutral-400 mb-1.5">LinkedIn Profile Link for Admin Verification *</label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://www.linkedin.com/in/your-profile"
+                  value={linkedinProfileUrl}
+                  onChange={(e) => setLinkedinProfileUrl(e.target.value)}
+                  className="w-full bg-neutral-950 border border-neutral-800 focus:border-amber-500 focus:outline-none rounded px-3 py-2 text-sm transition"
+                />
+                <p className="text-[10px] text-neutral-500 mt-1.5">
+                  This is only for admin review before your experience is published.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* SECTION 2: Narrative Logs */}
@@ -535,11 +587,11 @@ export default function SharePage() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 rounded-full border-2 border-t-black border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-                  Publishing Journey...
+                  {isAdminUser ? 'Publishing Journey...' : 'Submitting for Approval...'}
                 </>
               ) : (
                 <>
-                  Publish Journey
+                  {isAdminUser ? 'Publish Journey' : 'Submit for Admin Approval'}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

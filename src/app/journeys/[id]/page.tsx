@@ -88,6 +88,34 @@ const REACTION_EMOJIS: Record<string, { label: string; emoji: string }> = {
   respect: { label: 'Respect', emoji: '✊' },
 };
 
+const renderLinkedText = (text: string) => {
+  const urlRegex = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+  const exactUrlRegex = /^(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)$/i;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, idx) => {
+    if (!exactUrlRegex.test(part)) return <React.Fragment key={idx}>{part}</React.Fragment>;
+
+    const trailingPunctuation = part.match(/[),.!?]+$/)?.[0] || '';
+    const cleanUrl = trailingPunctuation ? part.slice(0, -trailingPunctuation.length) : part;
+    const href = cleanUrl.startsWith('www.') ? `https://${cleanUrl}` : cleanUrl;
+
+    return (
+      <React.Fragment key={idx}>
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          className="text-amber-500 underline underline-offset-2 hover:text-amber-400"
+        >
+          {cleanUrl}
+        </a>
+        {trailingPunctuation}
+      </React.Fragment>
+    );
+  });
+};
+
 export default function JourneyDetailPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
@@ -393,7 +421,7 @@ export default function JourneyDetailPage() {
               <section>
                 <h2 className="text-xs uppercase font-extrabold tracking-widest text-amber-500 mb-3">The Journal: What Happened</h2>
                 <p className="text-neutral-300 text-sm sm:text-base leading-relaxed whitespace-pre-line font-sans">
-                  {journey.whatHappened}
+                  {renderLinkedText(journey.whatHappened)}
                 </p>
               </section>
 

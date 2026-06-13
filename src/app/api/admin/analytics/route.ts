@@ -38,7 +38,7 @@ export async function GET() {
       ActivityLog.find().sort({ createdAt: -1 }).limit(50).exec(),
       ActivityLog.countDocuments({ createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }),
       User.countDocuments({ avatarUrl: { $regex: /imgbb|ibb|cloudinary/ } }),
-      Journey.find({ status: 'flagged' }).exec(),
+      Journey.find({ status: 'flagged' }).sort({ createdAt: -1 }).exec(),
       Comment.find({ isFlagged: true }).exec(),
       Journey.find({ status: { $ne: 'archived' } }).sort({ createdAt: -1 }).limit(150).exec()
     ]);

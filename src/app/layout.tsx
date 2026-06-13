@@ -56,7 +56,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#050505] text-white selection:bg-amber-500/30 selection:text-white">
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-[#050505] text-white selection:bg-amber-500/30 selection:text-white"
+      >
         <AuthProvider>
           {/* Header Navigation */}
           <header className="sticky top-0 z-40 w-full border-b border-neutral-900 bg-[#050505]/80 backdrop-blur-md">

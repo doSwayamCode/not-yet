@@ -31,6 +31,7 @@ const journeyCreateSchema = z.object({
   reflection: z.string().min(10, 'Reflection must be at least 10 characters'),
   visibility: z.enum(['public', 'anonymous', 'nickname']),
   nickname: z.string().optional(),
+  linkedinProfileUrl: z.string().url('Please enter a valid LinkedIn profile URL').optional().or(z.literal('')),
 });
 
 // GET /api/journeys
@@ -122,6 +123,11 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const validated = journeyCreateSchema.parse(body);
+    const isAdminSubmission = session.email === 'swayamgupta999@gmail.com' || session.role === 'admin';
+
+    if (!isAdminSubmission && !validated.linkedinProfileUrl) {
+      return NextResponse.json({ error: 'Please add your LinkedIn profile link for admin verification.' }, { status: 400 });
+    }
 
     // Calculate reading time (~200 words per minute)
     const totalWords = [
@@ -208,8 +214,9 @@ export async function POST(req: Request) {
       reflection: validated.reflection,
       readingTime,
       visibility: validated.visibility,
-      isPublished: true,
-      status: 'active',
+      linkedinProfileUrl: validated.linkedinProfileUrl || undefined,
+      isPublished: isAdminSubmission,
+      status: isAdminSubmission ? 'active' : 'flagged',
       commentsCount: 0,
       reactions: { relatable: 0, beenThere: 0, learnedSomething: 0, inspiredMe: 0, neededThis: 0, respect: 0 },
     });
@@ -225,45 +232,54 @@ export async function POST(req: Request) {
 
     const pointsEarned = 50 + (failureCount * 10);
 
-    // Update User Stats & Score
-    await User.findByIdAndUpdate(user._id, {
-      $inc: {
-        persistenceScore: pointsEarned,
-        'stats.storiesPublished': 1,
-        'stats.attemptsCount': validated.timeline.length,
-        'stats.rejectionsCount': failureCount,
-        'stats.lessonsCount': 1,
-      },
-    });
-
-    // Update global counters (live database counter)
-    await CounterMetrics.findOneAndUpdate(
-      { key: 'global_counter' },
-      {
+    if (isAdminSubmission) {
+      // Update User Stats & Score
+      await User.findByIdAndUpdate(user._id, {
         $inc: {
-          applicationsRejected: failureCount,
-          interviewsFailed: interviewCount,
-          hackathonsLost: hackathonCount,
-          startupsClosed: startupCount,
-          projectsAbandoned: projectCount,
-          lessonsShared: 1,
-          peopleHelped: 5, // mock weight for publishing
-          storiesPublished: 1,
+          persistenceScore: pointsEarned,
+          'stats.storiesPublished': 1,
+          'stats.attemptsCount': validated.timeline.length,
+          'stats.rejectionsCount': failureCount,
+          'stats.lessonsCount': 1,
         },
-      },
-      { upsert: true, new: true }
-    );
+      });
+
+      // Update global counters (live database counter)
+      await CounterMetrics.findOneAndUpdate(
+        { key: 'global_counter' },
+        {
+          $inc: {
+            applicationsRejected: failureCount,
+            interviewsFailed: interviewCount,
+            hackathonsLost: hackathonCount,
+            startupsClosed: startupCount,
+            projectsAbandoned: projectCount,
+            lessonsShared: 1,
+            peopleHelped: 5, // mock weight for publishing
+            storiesPublished: 1,
+          },
+        },
+        { upsert: true, new: true }
+      );
+    }
 
     // Log this system event
     await ActivityLog.create({
       userId: session.userId,
       username: user.username,
-      action: 'JOURNEY_CREATE',
-      details: `Created journey: "${validated.title}" earning ${pointsEarned} points. Visibility: ${validated.visibility}`,
-      severity: 'info',
+      action: isAdminSubmission ? 'JOURNEY_CREATE' : 'JOURNEY_SUBMIT_FOR_APPROVAL',
+      details: isAdminSubmission
+        ? `Created journey: "${validated.title}" earning ${pointsEarned} points. Visibility: ${validated.visibility}`
+        : `Submitted journey for admin approval: "${validated.title}". LinkedIn: ${validated.linkedinProfileUrl}`,
+      severity: isAdminSubmission ? 'info' : 'warning',
     });
 
-    return NextResponse.json({ success: true, journey: newJourney, pointsEarned });
+    return NextResponse.json({
+      success: true,
+      journey: newJourney,
+      pointsEarned: isAdminSubmission ? pointsEarned : 0,
+      pendingApproval: !isAdminSubmission,
+    });
   } catch (error: any) {
     console.error('Error creating journey:', error);
     

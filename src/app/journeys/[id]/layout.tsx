@@ -16,7 +16,7 @@ export async function generateMetadata(
     await connectToDatabase();
     const journey = await Journey.findById(id);
     
-    if (!journey) {
+    if (!journey || !journey.isPublished || journey.status === 'archived') {
       return {
         title: 'Journey Not Found | notYET',
       };

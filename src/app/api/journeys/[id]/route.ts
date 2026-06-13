@@ -20,6 +20,15 @@ export async function GET(
       return NextResponse.json({ error: 'Journey not found' }, { status: 404 });
     }
 
+    if (!journey.isPublished) {
+      const session = await getServerAuth();
+      const canViewPending = session.userId === journey.userId || session.role === 'admin';
+
+      if (!canViewPending) {
+        return NextResponse.json({ error: 'Journey not found' }, { status: 404 });
+      }
+    }
+
     return NextResponse.json({ success: true, journey });
   } catch (error: any) {
     console.error('Error fetching journey:', error);
