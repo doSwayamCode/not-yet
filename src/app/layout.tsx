@@ -118,6 +118,7 @@ export default function RootLayout({
                 <Link href="/share" className="hover:text-neutral-400 transition">Share</Link>
                 <Link href="/behind-the-win" className="hover:text-neutral-400 transition">Behind The Win</Link>
                 <a href="#" className="hover:text-neutral-400 transition">Terms & Privacy</a>
+                <a href="https://resume-sutra-7i6v.vercel.app/" className="hover:text-red-500 transition">Resume Sutra</a>
               </div>
             </div>
           </footer>
